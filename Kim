@@ -1,0 +1,126 @@
+-- [[ SIM HUB - Roblox Script ]] --
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "SIM HUB",
+   LoadingTitle = "SIM HUB Executing...",
+   LoadingSubtitle = "by Assistant",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "SIMHUB_Config",
+      FileName = "Configuration"
+   },
+   KeySystem = false
+})
+
+local Tab = Window:CreateTab("Main Features", 4483362458) -- Title, Image
+
+-- Services & Remotes Setup
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+
+local BuyRemote = Remotes:WaitForChild("BuyAllShopRemote")
+local BossRemote = Remotes:WaitForChild("WorldBossClickDamageRemote")
+local MobRemote = Remotes:WaitForChild("ClickDamageRemote")
+
+-- Variables for Toggles
+local AutoBuy = false
+local AutoBoss = false
+local AutoMob = false
+local AutoBossAndMob = false
+
+-- Data Lists
+local BossList = {"Coyote", "EvilMom", "Toji", "Decayer", "Hawk"}
+local MobList = {688, 677, 669, 662, 655, 650, 641, 627, 620, 614, 608, 599, 592, 586, 579, 571, 566}
+
+-- [[ Function 1: ซื้อของ ]]
+Tab:CreateButton({
+   Name = "ซื้อของทั้งหมด (Buy All Shop)",
+   Callback = function()
+      BuyRemote:FireServer()
+   end,
+})
+
+Tab:CreateToggle({
+   Name = "Auto Buy All Shop (ซื้ออัตโนมัติ)",
+   CurrentValue = false,
+   Flag = "AutoBuyToggle",
+   Callback = function(Value)
+      AutoBuy = Value
+      task.spawn(function()
+         while AutoBuy do
+            BuyRemote:FireServer()
+            task.wait(1)
+         end
+      end)
+   end,
+})
+
+-- [[ Function 2: ตีบอสทั้งหมด ]]
+Tab:CreateToggle({
+   Name = "Auto Attack All Bosses (ตีบอสทั้งหมด - 0.1s)",
+   CurrentValue = false,
+   Flag = "AutoBossToggle",
+   Callback = function(Value)
+      AutoBoss = Value
+      task.spawn(function()
+         while AutoBoss do
+            for _, boss in ipairs(BossList) do
+               BossRemote:FireServer(boss)
+            end
+            task.wait(0.1)
+         end
+      end)
+   end,
+})
+
+-- [[ Function 3: ตีมอนสเตอร์ทั้งหมด ]]
+Tab:CreateToggle({
+   Name = "Auto Attack All Mobs (ตีมอนทั้งหมด - 0.1s)",
+   CurrentValue = false,
+   Flag = "AutoMobToggle",
+   Callback = function(Value)
+      AutoMob = Value
+      task.spawn(function()
+         while AutoMob do
+            for _, mobId in ipairs(MobList) do
+               MobRemote:FireServer(mobId)
+            end
+            task.wait(0.1)
+         end
+      end)
+   end,
+})
+
+-- [[ Function 4 & 5: ตีบอส + ตีมอนสเตอร์ พร้อมกันในที่เดียว (ความเร็ว 0.1s) ]]
+Tab:CreateToggle({
+   Name = "🔥 Auto Attack ALL (บอส + มอนสเตอร์ - 0.1s)",
+   CurrentValue = false,
+   Flag = "AutoBossAndMobToggle",
+   Callback = function(Value)
+      AutoBossAndMob = Value
+      task.spawn(function()
+         while AutoBossAndMob do
+            -- ตีบอสทั้งหมด
+            for _, boss in ipairs(BossList) do
+               BossRemote:FireServer(boss)
+            end
+            
+            -- ตีมอนสเตอร์ทั้งหมด
+            for _, mobId in ipairs(MobList) do
+               MobRemote:FireServer(mobId)
+            end
+            
+            task.wait(0.1)
+         end
+      end)
+   end,
+})
+
+Rayfield:Notify({
+   Title = "SIM HUB",
+   Content = "โหลดสคริปต์เรียบร้อยแล้ว!",
+   Duration = 5,
+   Image = 4483362458,
+})
